@@ -1,0 +1,134 @@
+/**
+ * 設計代幣。三層：原始值 → 語意 → 元件。
+ * 元件裡不准出現裸的 hex 或一次性數值，否則下一個畫面就會長出第 11 種圓角。
+ */
+:root {
+  /* 表面與文字 */
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-2: #eef0f5;
+  --edge: #dfe3ec;
+  --text: #171a21;
+  --text-2: #4d5464;
+  --muted: #6b7386;      /* 對 --bg 4.61:1，舊值 #868da0 只有 3.12:1 */
+  --ruby: #5a6274;       /* 振假名專用，5.9:1。它是辨認漢字讀音的唯一線索 */
+  --trail: #b9c0d4;
+  --star: #f5b301;
+
+  /* 主題差異收斂成代幣，不要靠每個元件自己記得補深色 */
+  --brand: linear-gradient(140deg, #4f7cf7, #7b4ff7);
+  --brand-solid: #4f7cf7;
+  --elev-card: 0 6px 20px -12px rgb(0 0 0 / 0.3);
+  --scrim: rgb(15 18 25 / 0.5);
+  --chip-a: 0.12;        /* chip 底色透明度 */
+  --chip-l: 34%;         /* chip 文字亮度 */
+
+  /* 間距，4 為基底 */
+  --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+  --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+  /* 圓角 */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 20px; --r-full: 999px;
+
+  /* 字級。內文 16px、日文例句放大到 20px —— 日文才是這個頁面最該看清楚的東西 */
+  --t-xs: 13px; --t-sm: 15px; --t-md: 16px; --t-lg: 20px; --t-xl: 24px;
+
+  /* 版面：側欄固定寬、內容欄有上限。不要卡片套卡片 */
+  --rail-w: 280px; --read-w: 720px;
+
+  /* 動態 */
+  --dur-fast: 120ms; --dur-base: 200ms; --dur-slow: 320ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* 觸控目標下限 */
+  --tap: 44px;
+
+  color-scheme: light dark;
+  accent-color: var(--brand-solid);
+  scrollbar-color: var(--trail) transparent;
+  scrollbar-width: thin;
+
+  font-family: 'Noto Sans TC', 'Noto Sans JP', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', 'Hiragino Sans', 'Microsoft JhengHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0f1116;
+    --surface: #171a21;
+    --surface-2: #1f232c;
+    --edge: #2a2f3a;
+    --text: #eef0f5;
+    --text-2: #aeb5c4;
+    --muted: #8a92a4;
+    --ruby: #b6bdcc;
+    --trail: #39404f;
+    --brand: linear-gradient(140deg, #6b8ef8, #9270f8);
+    --brand-solid: #6b8ef8;
+    /* 深色下黑影等於沒有高度差，改用邊框加深影 */
+    --elev-card: 0 0 0 1px #2a2f3a, 0 8px 24px -14px rgb(0 0 0 / 0.8);
+    --scrim: rgb(4 6 10 / 0.72);
+    --chip-a: 0.18;
+    --chip-l: 76%;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0f1116;
+  --surface: #171a21;
+  --surface-2: #1f232c;
+  --edge: #2a2f3a;
+  --text: #eef0f5;
+  --text-2: #aeb5c4;
+  --muted: #8a92a4;
+  --ruby: #b6bdcc;
+  --trail: #39404f;
+  --brand: linear-gradient(140deg, #6b8ef8, #9270f8);
+  --brand-solid: #6b8ef8;
+  --elev-card: 0 0 0 1px #2a2f3a, 0 8px 24px -14px rgb(0 0 0 / 0.8);
+  --scrim: rgb(4 6 10 / 0.72);
+  --chip-a: 0.18;
+  --chip-l: 76%;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.75;
+  font-size: var(--t-md);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--brand-solid) 30%, transparent);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 3px;
+}
+
+/* 日文注音 ruby 會把行高撐高，列表與卡片都要預留空間 */
+ruby { ruby-position: over; }
+rt {
+  font-size: 0.6em;
+  color: var(--ruby);
+  font-weight: 500;
+}
+
+/**
+ * 減少動態：關掉編排式動畫，但保留狀態回饋。
+ * 全域 0.01ms 會連按壓回饋一起殺掉，使用者反而不知道自己按到了沒。
+ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-fast) !important;
+    scroll-behavior: auto !important;
+  }
+}
