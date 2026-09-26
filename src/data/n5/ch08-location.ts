@@ -9,7 +9,8 @@
  * 漢字六個（上下左右中外），單字吃「方位」整組十六個字 ——
  * 那是十四組主題裡最後一組完全沒動過的。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -35,8 +36,6 @@ const words = (...kanaList: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：說出有什麼、有誰 ─────────────────────────── */
 
@@ -60,6 +59,7 @@ const lesson1: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '兩個「有」',
       columns: ['動詞', '用於', '例'],
       rows: [
@@ -144,6 +144,7 @@ const lesson2: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '十二個位置詞',
       columns: ['詞', '意思', '詞', '意思'],
       rows: [
@@ -320,6 +321,7 @@ const lesson4: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種列舉',
       columns: ['形式', '意思', '例'],
       rows: [

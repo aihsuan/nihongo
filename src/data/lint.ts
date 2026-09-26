@@ -5,11 +5,12 @@
  * 題幹三個空格但只給兩個正解、題庫不夠重抽用。
  * 這些錯誤要等到使用者做到那一題才會發現，所以開發模式下每次啟動就跑一次。
  */
-import type { Chapter, Level, Question } from '../core/types'
+import type { Chapter, Level, Question, TableBlock } from '../core/types'
 import { morae } from '../core/mora'
 import { LESSON_QUESTIONS, QUIZ_EVERY } from '../core/progress'
 import { THEMES, THEME_LABEL, THEME_STATUS, VOCAB, vocabKp, byTheme } from './n5/vocab'
 import { KANJI, hasKanji } from './n5/kanji'
+import { CATEGORIES } from './reference'
 
 /** 題庫要大於抽題數，重考才抽得出不重複的題目 */
 const MIN_BANK = 18
@@ -24,9 +25,77 @@ const MIN_BANK = 18
  */
 const FOREIGN_SCRIPT = /[\u0400-\u04FF\u0600-\u06FF\u0900-\u097F\u0E00-\u0E7F\uAC00-\uD7AF]/
 
+/** 去掉振り仮名與強調標記，只留畫面上真正看得到的字 */
+const stripMark = (t: string) =>
+  t
+    .replace(/\*\*/g, '')
+    .replace(/\{[^}]*\}/g, '')
+    // 〜・「」這些是排版符號不是內容。留著的話「〜くて」就比對不到
+    // 「安くて おいしいです」裡的くて，洩漏就會被漏掉。
+    .replace(/[〜～・「」（）()]/g, '')
+    .replace(/\s+/g, '')
+
+/**
+ * 振り仮名的注音範圍。與 core/inline.ts 的 RUBY 必須一致 ——
+ * 不一致的話，這裡檢查過的東西畫面上會長成另一個樣子。
+ */
+const RUBY = /([一-鿿々ぁ-んァ-ヶー]+)\{([^{}]+)\}/g
+
+/**
+ * 注音有沒有蓋住整個注音對象。
+ *
+ * 陷阱在於注音的「底字」可以包含假名（這是為了讓「食べます{たべます}」
+ * 這種整詞注音成立）。所以寫成「ご覧」配上注音「らん」時，底字是**ご覧兩個字**，
+ * 畫面上整組會被換成「らん」，那個ご 就不見了。注音必須包含開頭那個ご。
+ *
+ * 這個錯之前修過一批（ご飯、お名前 那幾個），但漏了幾個，
+ * 而且它完全不會報錯 —— 只是畫面上悄悄少一個字。
+ */
+function checkRuby(text: string, where: string, push: (m: string) => void) {
+  for (const m of text.matchAll(RUBY)) {
+    const [, base, reading] = m
+    // 只看**平假名**開頭。片假名開頭是合法的：「ア行{あぎょう}」的注音
+    // 本來就是整組的平假名讀法，要求它以「ア」開頭是胡說。
+    const lead = base.match(/^[ぁ-ん]+/)?.[0]
+    if (lead && !reading.startsWith(lead)) {
+      push(
+        `${where}：「${base}{${reading}}」的注音沒有包含開頭的「${lead}」，` +
+          `畫面上會變成「${reading}」少一個字。應該寫成「${base}{${lead}${reading}}」`,
+      )
+    }
+  }
+}
+
 function checkText(text: string, where: string, push: (m: string) => void) {
   const m = text.match(FOREIGN_SCRIPT)
   if (m) push(`${where}：內容含有不該出現的文字「${m[0]}」（${text.slice(0, 30)}…）`)
+  checkRuby(text, where, push)
+}
+
+/**
+ * 表格的儲存格有沒有白填的 speak。
+ *
+ * 這條檢查是踩到坑之後才加的：速查區的羅馬字對照表把假名放在第一欄，
+ * 而 ContentBlocks 一律把第一欄畫成列標題（th），那條分支根本沒有發音按鈕。
+ * 結果整欄假名靜靜地點不出聲音 —— 型別過、建置過、畫面也長得出來，
+ * 全站 164 條路由的掃描也抓不到，因為「少一顆按鈕」不是渲染錯誤。
+ *
+ * 資料面的判準很單純：**填了 speak 就代表作者想讓它可以點**，
+ * 落在點不到的欄位就是矛盾。
+ */
+function checkTable(block: TableBlock, where: string, push: (m: string) => void) {
+  const cols = block.columns.length
+  block.rows.forEach((row, r) => {
+    if (row.length !== cols) {
+      push(`${where}：第 ${r + 1} 列有 ${row.length} 格，但表頭有 ${cols} 欄`)
+    }
+    if (block.rowHeader !== false && row[0]?.speak) {
+      push(
+        `${where}：第 ${r + 1} 列的第一欄「${row[0].text}」填了 speak，` +
+          `但第一欄會畫成列標題、點不到。若這一欄是內容而不是標籤，請設 rowHeader: false`,
+      )
+    }
+  })
 }
 
 function checkQuestion(q: Question, seen: Set<string>, push: (m: string) => void) {
@@ -142,6 +211,7 @@ function checkChapter(chapter: Chapter, seen: Set<string>, prints: Set<string>, 
       }
       if (block.type === 'table') {
         block.rows.flat().forEach((c) => checkText(c.text, lesson.id, push))
+        checkTable(block, `${lesson.id}／${block.heading ?? '無標題表格'}`, push)
       }
       if (block.type !== 'examples') continue
       for (const item of block.items) {
@@ -176,6 +246,51 @@ export function lintContent(levels: Level[]): string[] {
   for (const level of levels) {
     for (const chapter of level.chapters) {
       checkChapter(chapter, seenIds, seenPrints, push)
+    }
+  }
+
+  // 速查區的表要一起檢查。有一半是章節共用的（走上面那圈就檢查到了），
+  // 但假名那七張是直接從 kana.ts 生成、不屬於任何一課 ——
+  // 只掃課程的話，剛好漏掉的就是那批。羅馬字表的按鈕就是這樣漏掉的。
+  const seenSheets = new Set<string>()
+  for (const category of CATEGORIES) {
+    for (const sheet of category.sheets) {
+      if (seenSheets.has(sheet.id)) push(`速查有重複的 sheet id：${sheet.id}`)
+      seenSheets.add(sheet.id)
+      const where = `速查／${category.title}／${sheet.title}`
+      checkText(sheet.title, where, push)
+      if (sheet.note) checkText(sheet.note, where, push)
+      sheet.table.rows.flat().forEach((c) => checkText(c.text, where, push))
+      checkTable(sheet.table, where, push)
+      if (sheet.blankColumns) {
+        const n = sheet.table.columns.length
+        for (const c of sheet.blankColumns) {
+          if (c < 0 || c >= n) push(`${where}：blankColumns 的 ${c} 超出 ${n} 欄的範圍`)
+        }
+        if (sheet.blankColumns.length === 0) push(`${where}：blankColumns 是空陣列，應該直接不填`)
+        // 整張表都挖掉的話，填空版會是一張沒有任何線索的白紙
+        if (sheet.blankColumns.length >= n) push(`${where}：blankColumns 把每一欄都挖掉了`)
+
+        // 挖掉一欄，答案卻還留在同一列的別欄裡 —— 那份填空考卷等於送分。
+        // 例：て形表挖掉「變成」欄，右邊「例」欄寫著「買います → 買って」。
+        // 這種洩漏用眼睛掃是看不出來的，要逐列比對才會發現。
+        const cols = new Set(sheet.blankColumns)
+        for (const [r, row] of sheet.table.rows.entries()) {
+          for (const c of sheet.blankColumns) {
+            const answer = stripMark(row[c]?.text ?? '')
+            if (answer.length < 2) continue
+            const leak = row.findIndex(
+              (cell, i) => !cols.has(i) && stripMark(cell.text).includes(answer),
+            )
+            if (leak !== -1) {
+              push(
+                `${where}：第 ${r + 1} 列挖掉第 ${c + 1} 欄的「${answer}」，` +
+                  `但第 ${leak + 1} 欄「${stripMark(row[leak].text)}」裡就有答案`,
+              )
+            }
+          }
+        }
+      }
     }
   }
   return problems

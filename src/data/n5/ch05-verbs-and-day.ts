@@ -9,7 +9,10 @@
  * 漢字十八個（日月火水木金土年時分午前後今毎週間何），
  * 單字吃掉「數字與時間」剩下的部分、整組「交通工具」，並開出動詞這一組。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
+import { clockTable, pointVsDurationTable } from '../reference/time'
+import { politeFormTable } from '../reference/verb'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -35,8 +38,6 @@ const words = (...kanaList: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：說出你做了什麼 ───────────────────────────── */
 
@@ -57,15 +58,7 @@ const lesson1: Lesson = {
         '這一章的動詞一律先給ます形。辭書形（読む）要到第 13 章才教——先能造句，再回頭拆結構。',
       ],
     },
-    {
-      type: 'table',
-      heading: '動詞丁寧形活用表',
-      columns: ['', '肯定', '否定'],
-      rows: [
-        [label('現在・未來'), say('読{よ}みます', 'よみます'), say('読{よ}みません', 'よみません')],
-        [label('過去'), say('読{よ}みました', 'よみました'), say('読{よ}みませんでした', 'よみませんでした')],
-      ],
-    },
+    politeFormTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -141,15 +134,7 @@ const lesson2: Lesson = {
         '「今週{こんしゅう}」「来年{らいねん}」這類也不加。判斷方式：如果它需要先知道「今天是哪天」才能算出來，就不加に。',
       ],
     },
-    {
-      type: 'table',
-      heading: '時刻的唸法（不規則的那幾個）',
-      columns: ['', '規則', '不規則'],
-      rows: [
-        [label('〜時'), say('いちじ・にじ・ごじ'), say('よじ・しちじ・くじ')],
-        [label('〜分'), say('にふん・ごふん'), say('いっぷん・さんぷん・よんぷん・ろっぷん・じゅっぷん')],
-      ],
-    },
+    clockTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -227,6 +212,7 @@ const lesson3: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '移動句的四個助詞',
       columns: ['助詞', '標出什麼', '例'],
       rows: [
@@ -322,6 +308,7 @@ const lesson4: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '四個容易混的地點助詞',
       columns: ['助詞', '意思', '例'],
       rows: [
@@ -407,19 +394,10 @@ const lesson5: Lesson = {
         '**時間長度不加に**——「三時間{さんじかん} 働{はたら}きます」，不是「三時間に」。に 只用在指得到的時間點。',
       ],
     },
+    pointVsDurationTable,
     {
       type: 'table',
-      heading: '時間點與時間長度',
-      columns: ['', '時間點', '時間長度'],
-      rows: [
-        [label('小時'), say('三時{さんじ}', 'さんじ'), say('三時間{さんじかん}', 'さんじかん')],
-        [label('分鐘'), say('五分{ごふん}', 'ごふん'), say('五分間{ごふんかん}', 'ごふんかん')],
-        [label('週'), say('今週{こんしゅう}', 'こんしゅう'), say('一週間{いっしゅうかん}', 'いっしゅうかん')],
-        [label('年'), say('今年{ことし}', 'ことし'), say('一年間{いちねんかん}', 'いちねんかん')],
-      ],
-    },
-    {
-      type: 'table',
+      rowHeader: false,
       heading: '五個時間接尾語',
       columns: ['接尾語', '意思', '例'],
       rows: [

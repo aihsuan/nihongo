@@ -10,6 +10,7 @@ import { findChapter, findLesson, findLevel, lessonPath, quizPath } from '../dat
 import { chapterNodes, isLessonDone, LESSON_QUESTIONS } from '../core/progress'
 import { useProgress } from '../composables/useProgress'
 import { useSettings } from '../composables/useSettings'
+import { CHAPTER_CATEGORY, findCategory } from '../data/reference'
 import ContentBlocks from '../components/ContentBlocks.vue'
 import InlineText from '../components/InlineText.vue'
 import QuestionCard from '../components/QuestionCard.vue'
@@ -113,6 +114,17 @@ const saved = computed(() => (lesson.value ? state.lessons.get(lesson.value.id) 
 
 /** 這一輪有沒有動過 */
 const touched = computed(() => finalCorrect.size > 0)
+
+/**
+ * 這一章對應的速查分類。
+ * 逐張表的連結由 ContentBlocks 畫（靠物件 identity），
+ * 這裡補的是假名那兩章 —— 它們的速查表是生成的，對不上 identity。
+ */
+const refCategory = computed(() => {
+  if (!chapter.value) return undefined
+  const id = CHAPTER_CATEGORY[chapter.value.order]
+  return id ? findCategory(id) : undefined
+})
 </script>
 
 <template>
@@ -137,10 +149,13 @@ const touched = computed(() => finalCorrect.size > 0)
         <RouterLink v-if="lesson.printSet" class="print-link" :to="`/print/${lesson.printSet.id}`">
           列印這課的手寫練習紙
         </RouterLink>
+        <RouterLink v-if="refCategory" class="print-link" :to="`/ref/${refCategory.id}`">
+          速查・{{ refCategory.title }}（{{ refCategory.sheets.length }} 張全表）
+        </RouterLink>
       </div>
     </header>
 
-    <ContentBlocks :blocks="lesson.blocks" />
+    <ContentBlocks :blocks="lesson.blocks" link-to-reference />
 
     <section class="practice">
       <header class="practice-head">

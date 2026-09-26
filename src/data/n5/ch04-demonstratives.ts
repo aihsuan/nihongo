@@ -6,7 +6,10 @@
  * 指示語放在最前面是因為它讓人第一次能在真實場景裡開口 ——
  * 指著東西問「這是什麼」，不需要任何動詞。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
+import { konoSoreAreTable, kosoadoFullTable, questionWordsTable } from '../reference/kosoado'
+import { countersIntroTable, hundredThousandTable, oneToTenTable } from '../reference/number'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -33,8 +36,6 @@ const words = (...kanaList: string[]) =>
   })
 
 /** 可朗讀的儲存格 */
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：指著東西問這是什麼 ───────────────────────── */
 
@@ -55,14 +56,7 @@ const lesson1: Lesson = {
         '再加上疑問的「どれ」，就是完整的こそあど四兄弟。之後學到的所有指示語都照這個框架走。',
       ],
     },
-    {
-      type: 'table',
-      heading: 'これ・それ・あれ・どれ',
-      columns: ['', '離我近', '離你近', '離兩人都遠', '疑問'],
-      rows: [
-        [label('事物'), say('これ'), say('それ'), say('あれ'), say('どれ')],
-      ],
-    },
+    konoSoreAreTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -141,17 +135,7 @@ const lesson2: Lesson = {
         '記住這張表，日文的指示語就全部拿下了——之後不會再有新的了。',
       ],
     },
-    {
-      type: 'table',
-      heading: 'こそあど 完整表',
-      columns: ['', '近（こ）', '中（そ）', '遠（あ）', '疑問（ど）'],
-      rows: [
-        [label('事物'), say('これ'), say('それ'), say('あれ'), say('どれ')],
-        [label('接名詞'), say('この'), say('その'), say('あの'), say('どの')],
-        [label('場所'), say('ここ'), say('そこ'), say('あそこ'), say('どこ')],
-        [label('方向・客氣'), say('こちら'), say('そちら'), say('あちら'), say('どちら')],
-      ],
-    },
+    kosoadoFullTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -226,20 +210,7 @@ const lesson3: Lesson = {
         '「これは 本{ほん}です」→「これは 何{なん}ですか」。主詞、助詞、語序全都一樣。',
       ],
     },
-    {
-      type: 'table',
-      heading: '常用疑問詞',
-      columns: ['疑問詞', '問什麼'],
-      rows: [
-        [say('何{なに}・何{なん}', 'なに'), label('什麼')],
-        [say('だれ'), label('誰')],
-        [say('どこ'), label('哪裡')],
-        [say('いつ'), label('什麼時候')],
-        [say('どれ'), label('哪一個')],
-        [say('いくつ'), label('幾個')],
-        [say('いくら'), label('多少錢')],
-      ],
-    },
+    questionWordsTable,
     {
       type: 'note',
       heading: '疑問詞加「か」變成不確定，加「も」變成全稱',
@@ -322,35 +293,8 @@ const lesson4: Lesson = {
         '十以上就是組合：11＝じゅういち、25＝にじゅうご、100＝ひゃく、1234＝せんにひゃくさんじゅうよん。',
       ],
     },
-    {
-      type: 'table',
-      heading: '1 到 10',
-      columns: ['數字', '音読み', '訓読み（個數）'],
-      rows: [
-        [label('一'), say('いち'), say('ひとつ')],
-        [label('二'), say('に'), say('ふたつ')],
-        [label('三'), say('さん'), say('みっつ')],
-        [label('四'), say('よん・し'), say('よっつ')],
-        [label('五'), say('ご'), say('いつつ')],
-        [label('六'), say('ろく'), say('むっつ')],
-        [label('七'), say('なな・しち'), say('ななつ')],
-        [label('八'), say('はち'), say('やっつ')],
-        [label('九'), say('きゅう・く'), say('ここのつ')],
-        [label('十'), say('じゅう'), say('とお')],
-      ],
-    },
-    {
-      type: 'table',
-      heading: '百與千的音變',
-      columns: ['數字', '唸法', '注意'],
-      rows: [
-        [label('300'), say('さんびゃく'), label('ひゃく → びゃく')],
-        [label('600'), say('ろっぴゃく'), label('ろく → ろっ、ひゃく → ぴゃく')],
-        [label('800'), say('はっぴゃく'), label('はち → はっ、ひゃく → ぴゃく')],
-        [label('3000'), say('さんぜん'), label('せん → ぜん')],
-        [label('8000'), say('はっせん'), label('はち → はっ')],
-      ],
-    },
+    oneToTenTable,
+    hundredThousandTable,
     kanjiBlock('本課漢字', ['十', '百', '千', '万']),
     {
       type: 'examples',
@@ -398,19 +342,7 @@ const lesson5: Lesson = {
         '壞消息是有音變，而且不規則。下面那張表的 1、3、6、8 幾乎都要變，只能背。',
       ],
     },
-    {
-      type: 'table',
-      heading: '六個常用助数詞',
-      columns: ['量詞', '用於', '1', '2', '3'],
-      rows: [
-        [label('〜つ'), label('一般東西'), say('ひとつ'), say('ふたつ'), say('みっつ')],
-        [label('〜人'), label('人'), say('ひとり'), say('ふたり'), say('さんにん')],
-        [label('〜本'), label('細長的'), say('いっぽん'), say('にほん'), say('さんぼん')],
-        [label('〜枚'), label('扁平的'), say('いちまい'), say('にまい'), say('さんまい')],
-        [label('〜個'), label('小東西'), say('いっこ'), say('にこ'), say('さんこ')],
-        [label('〜冊'), label('書本'), say('いっさつ'), say('にさつ'), say('さんさつ')],
-      ],
-    },
+    countersIntroTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -498,6 +430,7 @@ const lesson6: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三個常用的限定說法',
       columns: ['形式', '意思', '例'],
       rows: [
@@ -608,13 +541,13 @@ const quiz1: Quiz = {
       '日曜日{にちようび}に パンと コーヒーを 買{か}います。いくらですか。',
       '２５０円{えん}', ['３００円{えん}', '３５０円{えん}', '２００円{えん}'],
       '平日的套餐是 300 円，但※那一行說週六日套餐 250 円。資訊檢索題的關鍵常常在註記那一行。',
-      'さくら店{てん}の おしらせ'),
+      'さくら店{さくらてん}の おしらせ'),
     jlptPassageQ('n5-c4-q1-b23', kp('いくら'),
       'パン　一{ひと}つ　１５０円{えん}\nコーヒー　一杯{いっぱい}　２００円{えん}\nパンと コーヒーの セット　３００円{えん}\n※ 土曜日{どようび}と 日曜日{にちようび}は セットが ２５０円{えん}です。',
       '月曜日{げつようび}に コーヒーだけ 買{か}います。いくらですか。',
       '２００円{えん}', ['１５０円{えん}', '２５０円{えん}', '３００円{えん}'],
       '只買コーヒー 就不是套餐價，照原價 200 円。',
-      'さくら店{てん}の おしらせ'),
+      'さくら店{さくらてん}の おしらせ'),
   ],
 }
 

@@ -9,7 +9,10 @@
  * 真正的難點是**連體修飾**：日文可以把一整個句子塞到名詞前面當形容詞。
  * 中文的「的」只能接短語，日文可以接完整的主謂結構，這個結構差異要花時間適應。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
+import { iAdjPlainTable, naAdjPlainTable } from '../reference/adjective'
+import { politeVsPlainVerbTable } from '../reference/verb'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -37,8 +40,6 @@ const words = (...selectors: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：動詞的普通形 ─────────────────────────────── */
 
@@ -59,17 +60,7 @@ const lesson1: Lesson = {
         '唯一沒教過的是過去否定——把ない形的「ない」換成「なかった」就好，因為ない 本身是い形容詞。',
       ],
     },
-    {
-      type: 'table',
-      heading: '丁寧形與普通形對照（動詞）',
-      columns: ['', '丁寧形', '普通形'],
-      rows: [
-        [label('現在肯定'), say('書{か}きます', 'かきます'), say('書{か}く', 'かく')],
-        [label('現在否定'), say('書{か}きません', 'かきません'), say('書{か}かない', 'かかない')],
-        [label('過去肯定'), say('書{か}きました', 'かきました'), say('書{か}いた', 'かいた')],
-        [label('過去否定'), say('書{か}きませんでした', 'かきませんでした'), say('書{か}かなかった', 'かかなかった')],
-      ],
-    },
+    politeVsPlainVerbTable,
     {
       type: 'sentences',
       heading: '同一件事的兩種說法',
@@ -151,28 +142,8 @@ const lesson2: Lesson = {
         '否定和過去也跟著換：じゃありません → じゃない、でした → だった、じゃありませんでした → じゃなかった。',
       ],
     },
-    {
-      type: 'table',
-      heading: 'い形容詞（高い）',
-      columns: ['', '丁寧形', '普通形'],
-      rows: [
-        [label('現在肯定'), say('高{たか}いです', 'たかいです'), say('高{たか}い', 'たかい')],
-        [label('現在否定'), say('高{たか}くないです', 'たかくないです'), say('高{たか}くない', 'たかくない')],
-        [label('過去肯定'), say('高{たか}かったです', 'たかかったです'), say('高{たか}かった', 'たかかった')],
-        [label('過去否定'), say('高{たか}くなかったです', 'たかくなかったです'), say('高{たか}くなかった', 'たかくなかった')],
-      ],
-    },
-    {
-      type: 'table',
-      heading: 'な形容詞・名詞（学生）',
-      columns: ['', '丁寧形', '普通形'],
-      rows: [
-        [label('現在肯定'), say('学生{がくせい}です', 'がくせいです'), say('学生{がくせい}だ', 'がくせいだ')],
-        [label('現在否定'), say('学生{がくせい}じゃありません', 'がくせいじゃありません'), say('学生{がくせい}じゃない', 'がくせいじゃない')],
-        [label('過去肯定'), say('学生{がくせい}でした', 'がくせいでした'), say('学生{がくせい}だった', 'がくせいだった')],
-        [label('過去否定'), say('学生{がくせい}じゃありませんでした', 'がくせいじゃありませんでした'), say('学生{がくせい}じゃなかった', 'がくせいじゃなかった')],
-      ],
-    },
+    iAdjPlainTable,
+    naAdjPlainTable,
     kanjiBlock('本課漢字', ['住', '使']),
     {
       type: 'examples',
@@ -638,7 +609,7 @@ const quiz1: Quiz = {
     jlptListenQ('n5-c15-q1-b21', kp('とき'),
       [
         { who: 'A', text: '日本{にほん}へ 行{い}った とき、何{なに}を 買{か}いましたか。' },
-        { who: 'B', text: 'お茶{ちゃ}を 買{か}いました。空港{くうこう}では ありません。町{まち}の 小{ちい}さい 店{みせ}で 買{か}いました。' },
+        { who: 'B', text: 'お茶{おちゃ}を 買{か}いました。空港{くうこう}では ありません。町{まち}の 小{ちい}さい 店{みせ}で 買{か}いました。' },
       ],
       'B 在哪裡買了茶？',
       '町{まち}の 店{みせ}', ['空港{くうこう}', '駅{えき}', '買{か}いませんでした'],

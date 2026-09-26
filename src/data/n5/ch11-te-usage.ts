@@ -9,7 +9,8 @@
  * 沒有新的變化要學，全部是應用。這是 N5 投資報酬率最高的一章：
  * 一個形態換來六種句型。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -39,8 +40,6 @@ const words = (...selectors: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：請人做事 ─────────────────────────────────── */
 
@@ -63,6 +62,7 @@ const lesson1: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種客氣程度',
       columns: ['形式', '語氣', '例'],
       rows: [
@@ -159,6 +159,7 @@ const lesson2: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '許可與禁止',
       columns: ['形式', '意思', '例'],
       rows: [
@@ -445,6 +446,7 @@ const lesson5: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種て形的接續',
       columns: ['形式', '意思', '例'],
       rows: [
@@ -536,6 +538,7 @@ const lesson6: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: 'て形接續總表',
       columns: ['接什麼', '意思'],
       rows: [

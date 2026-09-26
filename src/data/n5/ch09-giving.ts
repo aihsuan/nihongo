@@ -9,7 +9,8 @@
  * 漢字六個（友父母子女男），單字吃「家族」整組二十個字 ——
  * 那是十四組裡最落後的一組（3/20）。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -35,8 +36,6 @@ const words = (...kanaList: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：給出去、收進來 ───────────────────────────── */
 
@@ -59,6 +58,7 @@ const lesson1: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '給與收',
       columns: ['動詞', '方向', '句型'],
       rows: [
@@ -152,6 +152,7 @@ const lesson2: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三個動詞的視點',
       columns: ['動詞', '主詞是', '收的人'],
       rows: [

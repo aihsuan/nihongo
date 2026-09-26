@@ -9,6 +9,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Chapter, Level } from '../core/types'
 import { levels } from '../data/levels'
+import { CATEGORIES } from '../data/reference'
 import { chapterPath, lessonPath, levelPath, quizPath } from '../data/routes'
 import {
   chapterCompletion,
@@ -175,6 +176,24 @@ const counts = computed(() =>
         </div>
       </li>
     </ul>
+
+    <section class="ref" aria-label="速查">
+      <h2 class="ref-head">
+        速查
+        <span class="ref-sub">考前抓起來看的表</span>
+      </h2>
+      <ul class="ref-list">
+        <li v-for="c in CATEGORIES" :key="c.id">
+          <RouterLink :to="`/ref/${c.id}`" class="ref-link" @click="emit('navigate')">
+            <span class="ref-title">
+              {{ c.title }}
+              <span v-if="c.scope" class="ref-scope">N4+</span>
+            </span>
+            <span class="ref-count">{{ c.sheets.length }}</span>
+          </RouterLink>
+        </li>
+      </ul>
+    </section>
 
     <div class="foot">
       <RouterLink :to="levelPath(levels[0])" class="foot-link" @click="emit('navigate')">
@@ -355,6 +374,67 @@ const counts = computed(() =>
   padding: var(--s-2) var(--s-5) var(--s-4) var(--s-6);
   font-size: var(--t-xs);
   color: var(--muted);
+}
+
+.ref {
+  margin-top: var(--s-5);
+  padding: var(--s-4) 0 0;
+  border-top: 1px solid var(--edge);
+}
+
+.ref-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  margin: 0 0 var(--s-2);
+  padding: 0 var(--s-4);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.ref-sub { font-size: var(--t-xs); font-weight: 400; color: var(--muted); }
+
+.ref-list { margin: 0; padding: 0; list-style: none; }
+
+.ref-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-height: 38px;
+  padding: 0 var(--s-4);
+  color: var(--text-2);
+  font-size: var(--t-sm);
+  text-decoration: none;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.ref-link:hover { background: var(--surface-2); color: var(--text); }
+
+.ref-link.router-link-active {
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--brand-solid);
+}
+
+.ref-scope {
+  margin-left: var(--s-1);
+  padding: 1px 4px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.ref-count {
+  min-width: 18px;
+  padding: 0 5px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--t-xs);
+  text-align: center;
 }
 
 .foot {

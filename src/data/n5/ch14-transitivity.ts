@@ -8,7 +8,8 @@
  * 中文沒有這個區分——「門開了」和「我開門」用的是同一個「開」。
  * 日文有兩個不同的詞（開{あ}く／開{あ}ける），所以這是中文母語者必踩的坑。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -35,8 +36,6 @@ const words = (...selectors: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* 這一章的填空一律是「が」或「を」二選一，和課本的練習形式一致 */
 const gaWoQ = (id: string, prompt: string, answer: 'が' | 'を', explanation: string) =>
@@ -64,6 +63,7 @@ const lesson1: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '七組常用的對',
       columns: ['他動詞（有人做）', '自動詞（自己發生）', '意思'],
       rows: [
@@ -167,6 +167,7 @@ const lesson2: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種情況',
       columns: ['句子', '動詞類別', 'を 標什麼'],
       rows: [
@@ -239,6 +240,7 @@ const lesson3: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種「開著」',
       columns: ['形式', '意思', '暗示'],
       rows: [

@@ -8,7 +8,8 @@
  *
  * 所以第 1 課完全不教變化，只教怎麼判斷一個動詞是第幾類。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { teFormTable, teSoundChangeTable, verbClassesTable } from '../reference/verb'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -34,8 +35,6 @@ const words = (...kanaList: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：動詞分三類 ───────────────────────────────── */
 
@@ -56,16 +55,7 @@ const lesson1: Lesson = {
         '判斷的依據是**ます形去掉「ます」之後，最後一個音落在哪一段**。',
       ],
     },
-    {
-      type: 'table',
-      heading: '三類動詞',
-      columns: ['類別', '判斷', '例'],
-      rows: [
-        [label('III 類'), label('只有兩個，背下來'), say('します・来{き}ます', 'します、きます')],
-        [label('II 類'), label('去ます 後落在「え段」'), say('食{た}べます → たべ', 'たべます')],
-        [label('I 類'), label('去ます 後落在「い段」（多數）'), say('書{か}きます → かき', 'かきます')],
-      ],
-    },
+    verbClassesTable,
     {
       type: 'note',
       heading: '「い段」是模糊地帶',
@@ -156,18 +146,7 @@ const lesson2: Lesson = {
         '有名的記法是把前三組編成歌：「い・ち・り → って、み・び・に → んで、き → いて、ぎ → いで、し → して」。',
       ],
     },
-    {
-      type: 'table',
-      heading: 'I 類て形的五組音變',
-      columns: ['結尾', '變成', '例'],
-      rows: [
-        [label('い・ち・り'), label('って'), say('買{か}います → 買{か}って', 'かいます、かって')],
-        [label('み・び・に'), label('んで'), say('飲{の}みます → 飲{の}んで', 'のみます、のんで')],
-        [label('き'), label('いて'), say('書{か}きます → 書{か}いて', 'かきます、かいて')],
-        [label('ぎ'), label('いで'), say('泳{およ}ぎます → 泳{およ}いで', 'およぎます、およいで')],
-        [label('し'), label('して'), say('話{はな}します → 話{はな}して', 'はなします、はなして')],
-      ],
-    },
+    teSoundChangeTable,
     {
       type: 'sentences',
       heading: '五組各一個',
@@ -249,16 +228,7 @@ const lesson3: Lesson = {
         '所以て形的全部難度都在 I 類。這也是為什麼第 1 課的分類那麼重要——分對類，剩下的就是查表。',
       ],
     },
-    {
-      type: 'table',
-      heading: '三類的て形總表',
-      columns: ['類別', '規則', '例'],
-      rows: [
-        [label('I 類'), label('五組音變'), say('書{か}きます → 書{か}いて', 'かきます、かいて')],
-        [label('II 類'), label('ます → て'), say('食{た}べます → 食{た}べて', 'たべます、たべて')],
-        [label('III 類'), label('して／来{き}て'), say('勉強{べんきょう}します → 勉強{べんきょう}して', 'べんきょうします、べんきょうして')],
-      ],
-    },
+    teFormTable,
     {
       type: 'sentences',
       heading: '混合練習',

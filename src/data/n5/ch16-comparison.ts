@@ -9,7 +9,8 @@
  * 這一章把前面十五章零散出現過的「連接兩個句子」的方式收攏起來 ——
  * 原因、逆接、條件、推測，四種關係各有自己的接法。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -37,8 +38,6 @@ const words = (...selectors: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：比較 ─────────────────────────────────────── */
 
@@ -60,6 +59,7 @@ const lesson1: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '比較的三個句型',
       columns: ['句型', '意思', '例'],
       rows: [
@@ -153,6 +153,7 @@ const lesson2: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三者比較',
       columns: ['形式', '前面接', '語氣'],
       rows: [
@@ -254,6 +255,7 @@ const lesson3: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種轉折',
       columns: ['形式', '位置', '正式度'],
       rows: [
@@ -454,6 +456,7 @@ const lesson5: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '三種限定',
       columns: ['形式', '語氣', '例'],
       rows: [

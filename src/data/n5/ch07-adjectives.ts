@@ -9,7 +9,9 @@
  * 漢字八個都是形容詞本身（大小高安新古長白），單字吃「服裝」與「身體各部位」，
  * 並開出形容詞與副詞三組。
  */
-import type { Chapter, Lesson, Quiz, TableCell } from '../../core/types'
+import type { Chapter, Lesson, Quiz } from '../../core/types'
+import { label, say } from '../cells'
+import { adjBeforeNounTable, adjJoinTable, iAdjPoliteTable, naAdjPoliteTable } from '../reference/adjective'
 import {
   customChoiceQ,
   grammarFillQ,
@@ -35,8 +37,6 @@ const words = (...kanaList: string[]) =>
     return { jp: v.kana, kanji: v.kanji, zh: v.zh, accent: v.accent }
   })
 
-const say = (text: string, speak = text): TableCell => ({ text, speak })
-const label = (text: string): TableCell => ({ text })
 
 /* ── 第 1 課：兩種形容詞 ───────────────────────────────── */
 
@@ -58,15 +58,7 @@ const lesson1: Lesson = {
         '這一課只做分類。分錯類的話，後面每一個變化都會錯，所以先把這件事做對再往下走。',
       ],
     },
-    {
-      type: 'table',
-      heading: '接名詞的方式',
-      columns: ['類別', '接名詞', '例'],
-      rows: [
-        [label('い形容詞'), label('直接接'), say('大{おお}きい 部屋{へや}', 'おおきいへや')],
-        [label('な形容詞'), label('中間加 な'), say('静{しず}かな 部屋{へや}', 'しずかなへや')],
-      ],
-    },
+    adjBeforeNounTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -142,24 +134,8 @@ const lesson2: Lesson = {
         '所以な形其實不用另外背：你在第 3 章學名詞句時就已經學會了。',
       ],
     },
-    {
-      type: 'table',
-      heading: 'い形容詞（高い）',
-      columns: ['', '肯定', '否定'],
-      rows: [
-        [label('現在'), say('高{たか}いです', 'たかいです'), say('高{たか}くないです', 'たかくないです')],
-        [label('過去'), say('高{たか}かったです', 'たかかったです'), say('高{たか}くなかったです', 'たかくなかったです')],
-      ],
-    },
-    {
-      type: 'table',
-      heading: 'な形容詞（静かだ）',
-      columns: ['', '肯定', '否定'],
-      rows: [
-        [label('現在'), say('静{しず}かです', 'しずかです'), say('静{しず}かじゃありません', 'しずかじゃありません')],
-        [label('過去'), say('静{しず}かでした', 'しずかでした'), say('静{しず}かじゃありませんでした', 'しずかじゃありませんでした')],
-      ],
-    },
+    iAdjPoliteTable,
+    naAdjPoliteTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -244,16 +220,7 @@ const lesson3: Lesson = {
         '關鍵是「跟著前面那個走」——「安{やす}くて 静{しず}かです」的くて 是因為前面是い形，跟後面的静か 無關。',
       ],
     },
-    {
-      type: 'table',
-      heading: '連接形',
-      columns: ['類別', '連接形', '例'],
-      rows: [
-        [label('い形容詞'), label('〜くて'), say('安{やす}くて おいしいです', 'やすくておいしいです')],
-        [label('な形容詞'), label('〜で'), say('静{しず}かで きれいです', 'しずかできれいです')],
-        [label('名詞'), label('〜で'), say('学生{がくせい}で 二十歳{はたち}です', 'がくせいではたちです')],
-      ],
-    },
+    adjJoinTable,
     {
       type: 'sentences',
       heading: '例句',
@@ -527,6 +494,7 @@ const lesson6: Lesson = {
     },
     {
       type: 'table',
+      rowHeader: false,
       heading: '頻率由高到低',
       columns: ['副詞', '大致頻率'],
       rows: [

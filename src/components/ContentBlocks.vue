@@ -5,14 +5,29 @@
  * 教材是結構化資料不是 Markdown，換來的就是這裡：
  * 假名表的每一格都能點擊發音、羅馬字能被全域開關關掉。
  */
-import type { ContentBlock, TableCell } from '../core/types'
+import type { ContentBlock, TableBlock, TableCell } from '../core/types'
+import { sheetForTable } from '../data/reference'
 import { useSettings } from '../composables/useSettings'
 import { useSpeech } from '../composables/useSpeech'
 import { stripMarkup } from '../core/inline'
 import PitchAccent from './PitchAccent.vue'
 import InlineText from './InlineText.vue'
 
-defineProps<{ blocks: ContentBlock[] }>()
+const props = defineProps<{
+  blocks: ContentBlock[]
+  /**
+   * 表格底下要不要顯示「速查區也有這張」。
+   *
+   * 預設關掉：速查頁和它的列印版本身就在速查區，再連一次是繞圈。
+   * 課程頁才打開 —— 一個學到一半的人不會知道有速查區，要在他面前提一次。
+   */
+  linkToReference?: boolean
+}>()
+
+/** 這張表在速查區的位置；不在就回傳 undefined，不畫連結。 */
+function refOf(block: TableBlock) {
+  return props.linkToReference ? sheetForTable(block) : undefined
+}
 
 const { settings } = useSettings()
 const { speak, supported } = useSpeech()
@@ -45,11 +60,22 @@ function say(cell: TableCell) {
       <section v-else-if="block.type === 'table'" class="table-wrap">
         <h2 v-if="block.heading"><InlineText :text="block.heading" /></h2>
         <p v-if="supported" class="tip">點任何一個假名可以聽發音。</p>
+        <p v-if="refOf(block)" class="ref-note">
+          這張表在
+          <RouterLink :to="`/ref/${refOf(block)!.category.id}`">
+            速查・{{ refOf(block)!.category.title }}
+          </RouterLink>
+          也有，<RouterLink :to="`/print/ref/${refOf(block)!.category.id}`">可以列印</RouterLink>。
+        </p>
         <div class="scroller">
           <table>
             <thead>
               <tr>
-                <th v-for="(c, j) in block.columns" :key="j" :class="{ corner: j === 0 }">
+                <th
+                  v-for="(c, j) in block.columns"
+                  :key="j"
+                  :class="{ corner: j === 0 && block.rowHeader !== false }"
+                >
                   <InlineText :text="c" />
                 </th>
               </tr>
@@ -57,7 +83,9 @@ function say(cell: TableCell) {
             <tbody>
               <tr v-for="(row, r) in block.rows" :key="r">
                 <template v-for="(cell, c) in row" :key="c">
-                  <th v-if="c === 0" scope="row"><InlineText :text="cell.text" /></th>
+                  <th v-if="c === 0 && block.rowHeader !== false" scope="row">
+                    <InlineText :text="cell.text" />
+                  </th>
                   <td v-else :class="{ empty: !cell.text }">
                     <button
                       v-if="clickable(cell)"
@@ -259,6 +287,14 @@ td.empty { background: var(--surface-2); }
 .kana.phrase { padding: var(--s-3); }
 .kana.phrase .glyph { font-size: var(--t-md); line-height: 2; white-space: normal; }
 .romaji { font-size: var(--t-xs); color: var(--muted); font-variant: small-caps; }
+
+.ref-note {
+  margin: 0 0 var(--s-2);
+  font-size: var(--t-xs);
+  color: var(--muted);
+}
+.ref-note a { color: var(--brand-solid); text-decoration: none; }
+.ref-note a:hover { text-decoration: underline; }
 .hint { font-size: 11px; color: var(--muted); line-height: 1.3; }
 
 .examples ul {
