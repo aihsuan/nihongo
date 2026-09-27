@@ -31,6 +31,13 @@ export const router = createRouter({
       name: 'reference-print',
       component: () => import('./views/ReferencePrintView.vue'),
     },
+    {
+      // 常用漢字 2,136 字。資料約 113 KB，靠路由層級的 code splitting
+      // 切成獨立 chunk —— 不能讓它進主 bundle。
+      path: '/kanji',
+      name: 'kanji',
+      component: () => import('./views/KanjiView.vue'),
+    },
     { path: '/ref', redirect: '/ref/kana' },
     {
       path: '/ref/:category',

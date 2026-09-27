@@ -195,6 +195,21 @@ const counts = computed(() =>
       </ul>
     </section>
 
+    <section class="ref" aria-label="漢字">
+      <h2 class="ref-head">
+        漢字
+        <span class="ref-sub">常用漢字 2,136 字</span>
+      </h2>
+      <ul class="ref-list">
+        <li>
+          <RouterLink to="/kanji" class="ref-link" @click="emit('navigate')">
+            <span class="ref-title">查漢字</span>
+            <span class="ref-count">2136</span>
+          </RouterLink>
+        </li>
+      </ul>
+    </section>
+
     <div class="foot">
       <RouterLink :to="levelPath(levels[0])" class="foot-link" @click="emit('navigate')">
         N5 課程總覽

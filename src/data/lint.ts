@@ -39,7 +39,7 @@ const stripMark = (t: string) =>
  * 振り仮名的注音範圍。與 core/inline.ts 的 RUBY 必須一致 ——
  * 不一致的話，這裡檢查過的東西畫面上會長成另一個樣子。
  */
-const RUBY = /([一-鿿々ぁ-んァ-ヶー]+)\{([^{}]+)\}/g
+const RUBY = /([\p{Script=Han}々ぁ-んァ-ヶー]+)\{([^{}]+)\}/gu
 
 /**
  * 注音有沒有蓋住整個注音對象。
@@ -291,6 +291,29 @@ export function lintContent(levels: Level[]): string[] {
           }
         }
       }
+    }
+  }
+  return problems
+}
+
+/**
+ * 漢字表的一致性。
+ *
+ * zh.ts 是手寫的、dict.ts 是產生的 —— 兩邊靠字元當鍵配對。
+ * 手寫那份打錯一個字（或某個字被 KANJIDIC 移出常用漢字），
+ * 那筆中譯就會**靜靜地永遠不顯示**，沒有任何地方會報錯。
+ *
+ * 分開放是對的（重跑產生器不會洗掉中譯），代價就是要有人檢查鍵對不對。
+ */
+export function lintKanji(
+  rows: { char: string }[],
+  zh: Record<string, unknown>,
+): string[] {
+  const problems: string[] = []
+  const known = new Set(rows.map((r) => r.char))
+  for (const char of Object.keys(zh)) {
+    if (!known.has(char)) {
+      problems.push(`漢字中譯：「${char}」不在常用漢字表裡，這筆中譯不會顯示`)
     }
   }
   return problems
